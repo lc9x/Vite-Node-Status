@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <input type="text" id="viteAddr" placeholder="Vite Address">
+    <button type="button" id="changeAddr">Save</button>
+    <button type="button" id="trackOnlineNode" class="hidden" title="ON/OFF auto tracking active nodes">OFF</button>
+    <p id="noti"></p>
+    <p id="dataLoading" class="hidden">Data loading...</p>
+    <table id="dataWrapper" class="hidden">
+    	<tr>
+    		<td class="text1">Active Node Reward</td>
+    		<td class="text1">Voting Reward</td>
+    		<td colspan="3" class="text1">Node Information</td>
+    	</tr>
+    	<tr>
+    		<td>
+    			<div class="light text1">yesterday</div>
+    			<div class="text1"><span id="totalYesterdayFullReward">0</span> VITE</div>
+    		</td>
+    		<td>
+    			<div class="light text1">yesterday</div>
+    			<div class="text1"><span id="totalYesterdayVoteReward">0</span> VITE</div>
+    		</td>
+    		<td>
+    			<div class="light text1">Active Nodes</div>
+    			<div id="onlineNodeCount" class="text1">0</div>
+    		</td>
+    		<td>
+    			<div class="light text1">Rewarding Nodes</div>
+    			<div id="pledgeNodeCount" class="text1">--</div>
+    		</td>
+    		<td>
+    			<div class="light text1">Node Staking</div>
+    			<div class="text1"><span id="pledgeAmount">0</span> VITE</div>
+    		</td>
+    	</tr>
+    </table>
+    <script src="popup.js"></script>
+  </body>
+</html>

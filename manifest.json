@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Vite Viewer",
+  "description": "Show the rewards of the Vite Full Nodes",
+  "version": "1.0",
+  "background": {
+  	"service_worker": "background.js"
+  },
+  "permissions": ["storage"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "ViteX.png",
+      "32": "ViteX.png",
+      "48": "ViteX.png",
+      "128": "ViteX.png"
+    }
+  },
+  "icons": {
+    "16": "ViteX.png",
+    "32": "ViteX.png",
+    "48": "ViteX.png",
+    "128": "ViteX.png"
+  }
+}
