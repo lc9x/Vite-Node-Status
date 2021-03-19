@@ -1,7 +1,7 @@
 var addr, autoTracking, trackingInterval;
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-	console.log('onMessage');
+	console.log('onMessage', request);
 	if(request.dataUpdated){
 		console.log('message', request.dataUpdated);
 		trackingCheck();
@@ -57,4 +57,6 @@ function setBadge(text, title, isError){
 	chrome.action.setTitle({title: title});
 }
 
-trackingCheck();
+setTimeout(function(){
+	trackingCheck();
+}, 5000);

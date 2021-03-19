@@ -4,6 +4,7 @@ let trackOnlineNode = document.getElementById('trackOnlineNode');
 let noti = document.getElementById('noti');
 let dataWrapper = document.getElementById('dataWrapper');
 let dataLoading = document.getElementById('dataLoading');
+let nodesStatus = document.getElementById('nodesStatus');
 
 chrome.storage.sync.get('addr', ({ addr }) => {
 	viteAddr.value = addr || '';
@@ -60,34 +61,62 @@ trackOnlineNode.addEventListener('click', async() => {
 });
 
 function fetchData(addr){
-	var xhr = new XMLHttpRequest();
-	xhr.open('GET', 'https://vitex.vite.net/reward/pledge/full/stat?address='+ addr);
-	xhr.onload = xhr.onerror = function(){
-		dataLoading.classList.add('hidden');
-		var flag = true;
-		var data;
-		try {
-			data = JSON.parse(xhr.responseText);
-			if(!data['data']['totalYesterdayFullReward']){
-				flag = false;
-			}
-		} catch(e) {
-			console.log('error', e)
-		}
-		if(flag){
-			dataWrapper.classList.remove('hidden');
-			document.getElementById('totalYesterdayFullReward').textContent = data['data']['totalYesterdayFullReward'];
-			document.getElementById('totalYesterdayVoteReward').textContent = data['data']['totalYesterdayVoteReward'];
-			document.getElementById('onlineNodeCount').textContent = data['data']['onlineNodeCount'];
-			document.getElementById('pledgeNodeCount').textContent = data['data']['pledgeNodeCount'];
-			document.getElementById('pledgeAmount').textContent = data['data']['pledgeAmount'];
-		} else {
-			noti.textContent = 'Error, get data failed!';
-			noti.classList.remove('success');
-			noti.classList.add('error');
-			dataWrapper.classList.add('hidden');
-		}
-	};
 	dataLoading.classList.remove('hidden');
-	xhr.send();
+	fetch('https://vitex.vite.net/reward/pledge/full/stat?address='+ addr, {
+		mode: 'no-cors'
+	}).then(response => response.json()).then(function(data){
+		var totalYesterdayFullReward = data['data']['totalYesterdayFullReward']
+		document.getElementById('totalYesterdayFullReward').textContent = totalYesterdayFullReward;
+		document.getElementById('totalYesterdayVoteReward').textContent = data['data']['totalYesterdayVoteReward'];
+		document.getElementById('onlineNodeCount').textContent = data['data']['onlineNodeCount'];
+		document.getElementById('pledgeNodeCount').textContent = data['data']['pledgeNodeCount'];
+		document.getElementById('pledgeAmount').textContent = data['data']['pledgeAmount'];
+		dataWrapper.classList.remove('hidden');
+		dataLoading.classList.add('hidden');
+	}).catch((error) => {
+		noti.textContent = 'Error, get data failed!';
+		noti.classList.remove('success');
+		noti.classList.add('error');
+		dataWrapper.classList.add('hidden');
+	});
+	nodesStatus.classList.remove('hidden');
+	fetch('https://stats.vite.net/api/getAlivePeers?address='+ addr).then(res => res.json()).then(function(data){
+		console.log('data', data);
+		let list = data['list'];
+		let promises = [];
+		const nodes = list.map(node => {
+			var tr = document.createElement('tr');
+			tr.innerHTML = '<td>'+ encodeURI(node['nodeName']) +'</td><td>'+ encodeURI(node['ip']) +'</td><td>'+ encodeURI(node['isAlive']) +'</td><td class="chainHeight">Loading</td>';
+			nodesStatus.appendChild(tr);
+			return fetch('http://'+ node['ip'] +':48132/', {
+				method: 'POST',
+			    headers: {
+			      'Accept': 'application/json',
+			      'Content-Type': 'application/json',
+			      'Cache-Control': 'no-cache'
+			    },
+			    body: JSON.stringify({
+			        'jsonrpc': '2.0',
+			        'id': 2,
+			        'method': 'ledger_getSnapshotChainHeight',
+			        'params': 'null'
+			    })
+			}).then(res => res.json()).then(function(data){
+				console.log('data chain', data);
+				tr.querySelector('.chainHeight').textContent = data.result;
+			}).catch((err) => {
+				console.error('fetch chain height error', err);
+				tr.querySelector('.chainHeight').textContent = 'ERROR';
+			});
+		});
+		Promise.all(nodes);
+	}).catch((err) => {
+		console.error('fetch nodes from vite address error', err);
+	});
+	/*
+	chrome.runtime.sendMessage(null, { action: 'nodesStatus', addr: addr }, function(response){
+		console.log('response', response);
+		return;
+		
+	}); */
 }

@@ -21,5 +21,9 @@
     "32": "ViteX.png",
     "48": "ViteX.png",
     "128": "ViteX.png"
-  }
+  },
+  "host_permissions": [
+    "https://stats.vite.net/",
+    "https://vitex.vite.net/"
+  ]
 }
